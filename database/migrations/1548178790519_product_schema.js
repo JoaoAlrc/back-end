@@ -12,9 +12,6 @@ class ProductSchema extends Schema {
       table.text('description')
       table.integer('stock').unsigned().defaultTo(0)
       table.decimal('price', 12, 2).notNullable()
-      table.integer('total_orders').unsigned().defaultTo(0)
-      table.decimal('total_earnings', 12, 2).unsigned().defaultTo(0.0)
-      table.integer('image').unsigned()
       table.timestamps()
     })
 
