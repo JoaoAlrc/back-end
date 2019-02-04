@@ -29,9 +29,9 @@ class RoleSeeder {
     await manager.save()
 
     const user = new Role()
-    user.name = 'Usuário'
-    user.slug = 'user'
-    user.description = 'Usuário do Sistema'
+    user.name = 'Cliente'
+    user.slug = 'client'
+    user.description = 'Cliente do Sistema'
     await user.save()
   }
 }

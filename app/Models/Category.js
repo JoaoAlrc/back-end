@@ -9,6 +9,12 @@ class Category extends Model {
     image(){
         return this.belongsTo('App/Models/Images')
     }
+
+    // relacionamento entre Category e Products
+
+    products(){
+        return this.belongsToMany('App/Models/Product')
+    }
 }
 
 module.exports = Category

@@ -21,12 +21,12 @@ class User extends Model {
     })
   }
 
-    //oculta os campos definidos como ocultos, das queries no DB
-    static get hidden() {
-      return [
-        'password'
-      ]
-    }
+  //oculta os campos definidos como ocultos, das queries no DB
+  static get hidden() {
+    return [
+      'password'
+    ]
+  }
 
   //User Traits
   static get traits() {
@@ -50,8 +50,16 @@ class User extends Model {
     return this.hasMany('App/Models/Token')
   }
 
-  image(){
+  image() {
     return this.belongsTo('App/Models/Image')
+  }
+
+  coupons() {
+    return this.belongsToMany('App/Models/Coupon')
+  }
+
+  carts() {
+    return this.hasMany('App/Models/Cart')
   }
 }
 
