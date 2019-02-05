@@ -2,20 +2,29 @@
 
 const User = use('App/Models/User')
 const Role = use('Role')
+const Database = use('Database')
 
 class AuthController {
     async register({ request, response }) {
-        // request.body daria na mesma
-        const { username, name, surname, birthdate, cpf, email, password, address, addressNum, neighborhood, city, state, zipCode } = request.all()
+        try {
+            const trx = await Database.beginTransaction()
+            // request.body daria na mesma
+            const { username, name, surname, birthdate, cpf, email, password, address, addressNum, neighborhood, city, state, zipCode } = request.all()
 
-        const user = await User.create({ username, name, surname, birthdate, cpf, email, password, address, addressNum, neighborhood, city, state, zipCode })
+            const user = await User.create({ username, name, surname, birthdate, cpf, email, password, address, addressNum, neighborhood, city, state, zipCode }, trx)
 
-        const userRole = await Role.findBy('slug', 'client')
+            const userRole = await Role.findBy('slug', 'client')
 
-        // associa o userRole ao User
-        await user.roles().attach([userRole.id])
+            // associa o userRole ao User
+            await user.roles().attach([userRole.id])
 
-        return response.status(201).send({ data: user })
+            await trx.commit()
+
+            return response.status(201).send({ data: user })
+        } catch (e) {
+            await trx.rollback()
+            return response.status(400).send({ message: "Erro ao realizar cadastro.", message: e.message })
+        }
     }
 
     async login({ request, response, auth }) {
@@ -55,31 +64,6 @@ class AuthController {
             .revokeTokens([refresh_token], true)
 
         return response.send({ message: "User Logged Out!" })
-
-        // // checar que usuário está logado com o header Authorization, assim retirei o middleware 'auth' da rota
-        // try {
-        //     await auth.check()
-        // } catch (err) {
-        //     return response.status(401).send({ errors: [{ message: 'You are not logged in' }] })
-        // }
-        // // capturar o refresh_token pelo header ou por cookie (pois eu mando o refresh_token através de um cookie http no login)
-        // const refresh_token = request.cookie('refresh_token') || request.header('refresh_token')
-        // if (!refresh_token) {
-        //     // cookie não encontrado, erro
-        //     return response.status(400).send({ errors: [{ message: 'Refresh token not found in request' }] })
-        // }
-
-        // // se result for > 0, significa que nosso token foi revogado, ou seja, foi apagado do banco de dados
-        // const result = await auth.revokeTokens([refresh_token], true)
-        // // limpar o cookie caso ele exista
-        // response.clearCookie('refresh_token')
-        // if (result > 0) {
-        //     return response.status(200).send({ messages: [{ message: 'Success on logout' }] })
-        // }
-
-        // // se result não foi 0, não tenho certeza do que retornar, pois nesse caso não é um erro,
-        // // o token simplesmente já foi revogado e não poderá mais ser usado, estou informando isso
-        // return response.status(200).send({ messages: [{ message: 'Refresh token was already revoked' }] })
     }
 }
 

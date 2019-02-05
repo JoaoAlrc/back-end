@@ -7,7 +7,7 @@ class Category extends Model {
 
     //relacionamento entre categoria e imagem
     image(){
-        return this.belongsTo('App/Models/Images')
+        return this.belongsTo('App/Models/Image')
     }
 
     // relacionamento entre Category e Products

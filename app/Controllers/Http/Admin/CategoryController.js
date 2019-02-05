@@ -4,6 +4,12 @@
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
 /** @typedef {import('@adonisjs/framework/src/View')} View */
 
+const Category = use('App/Models/Category')
+const Helpers = use('Helpers')
+const Image = use('App/Models/Image')
+const { str_random } = use('App/Helpers')
+const Database = use('Database')
+
 /**
  * Resourceful controller for interacting with categories
  */
@@ -17,20 +23,11 @@ class CategoryController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async index ({ request, response, view }) {
-    return response.send({message: 'hello world'})
-  }
-
-  /**
-   * Render a form to be used for creating a new category.
-   * GET categories/create
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async create ({ request, response, view }) {
+  async index({ request, response, view }) {
+    const categories = await Category
+      .query()
+      .paginate()
+    return response.send(categories)
   }
 
   /**
@@ -41,7 +38,49 @@ class CategoryController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async store ({ request, response }) {
+  async store({ request, response }) {
+    try {
+      const transaction = await Database.beginTransaction()
+      const { title, description } = request.all() //poderia ser request.body
+
+      // tratamento da imagem
+      const image = request.file('image', {
+        types: ['image'],
+        size: '2mb'
+      })
+
+      // gera um nome aleatório
+      const random_name = await str_random(30)
+      let filename = `${new Date().getTime()}_${random_name}.${image.subtype}`
+
+      // renomeia o arquivo e move para public/uploads
+      await image.move(Helpers.publicPath('uploads'), {
+        name: filename
+      })
+
+      // verifica se foi movido e retorna o erro
+      if (!image.moved()) {
+        throw image.error()
+      }
+
+      const category_image = await Image.create({
+        path: filename,
+        size: image.size,
+        original_name: image.clientName,
+        extension: image.subtype
+      }, transaction)
+
+      const category = await Category.create({ title, description, image_id: category_image.id }, transaction)
+
+      await transaction.commit()
+      return response.status(201).send(category)
+    } catch (e) {
+      await transaction.rollback()
+      return response.status(400).send({
+        message: "Erro ao processar sua requisição.",
+        error: e.message
+      })
+    }
   }
 
   /**
@@ -53,7 +92,7 @@ class CategoryController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async show ({ params, request, response, view }) {
+  async show({ params, request, response, view }) {
   }
 
   /**
@@ -65,7 +104,7 @@ class CategoryController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async edit ({ params, request, response, view }) {
+  async edit({ params, request, response, view }) {
   }
 
   /**
@@ -76,7 +115,7 @@ class CategoryController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async update ({ params, request, response }) {
+  async update({ params, request, response }) {
   }
 
   /**
@@ -87,7 +126,7 @@ class CategoryController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async destroy ({ params, request, response }) {
+  async destroy({ params, request, response }) {
   }
 }
 
