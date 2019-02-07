@@ -16,8 +16,10 @@ const User = use('App/Models/User')
 
 class CartSeeder {
   async run() {
-    const clients = await User.query()
-      .whereHas('roles', builder => builder.where('slug', 'client'))
+    const clients = await User
+      .query()
+      .whereHas('roles', builder => builder
+        .where('slug', 'client'))
       .fetch()
 
     await Promise.all(

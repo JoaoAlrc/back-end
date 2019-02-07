@@ -28,12 +28,12 @@ class ClientSeeder {
       await client.coupons().attach([coupon.id])
     }))
     const user = await User.create({
-      username: "joaoalrc",
+      username: "jvalrc",
       name: "joão victor",
       surname: "alarcão p",
       birthdate: "1995-12-22",
-      cpf: "050.002.471-59",
-      email: "jv.alarcao@gmail.com",
+      cpf: "050.002.471-58",
+      email: "jv.alarcao@hotmail.com",
       password: "1234",
       address: "condo",
       addressNum: "21",

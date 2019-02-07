@@ -22,24 +22,41 @@ Route.get('/', () => {
 
 // authentication routes
 Route.group(() => {
-  Route.post('register', 'AuthController.register').as('auth.register')
-  Route.post('login', 'AuthController.login').as('auth.login')
-  Route.post('refresh', 'AuthController.refresh').as('auth.refresh')
   Route
-  .post('logout', 'AuthController.logout')
-  .as('auth.logout')
-  .middleware(['auth'])
+    .post('register', 'AuthController.register')
+    .as('auth.register')
+    .validator('Clients/ClientRegister')
+  Route
+    .post('login', 'AuthController.login')
+    .as('auth.login')
+    .validator('Clients/ClientLogin')
+  Route
+    .post('refresh', 'AuthController.refresh')
+    .as('auth.refresh')
+    .validator('Clients/ClientRefreshToken')
+  Route
+    .post('logout', 'AuthController.logout')
+    .as('auth.logout')
+    .middleware(['auth'])
+    .validator('Clients/ClientRefreshToken')
 })
-  .prefix('v1/auth')
+  .prefix('api/auth')
   .namespace('Auth')
 
-  // administration routes
-  Route.group(() => {
-    Route.resource('category', 'CategoryController').apiOnly()
-    Route.resource('product', 'ProductController').apiOnly()
-    Route.resource('coupon', 'CouponController').apiOnly()
-    Route.resource('order', 'OrderController').apiOnly()
-  })
-  .prefix('v1/admin')
+// administration routes
+Route.group(() => {
+  Route
+    .resource('category', 'CategoryController')
+    .apiOnly()
+    .validator(new Map([
+      [['category.store'], ['Category/Store']],
+      [['category.update'], ['Category/Update']]
+    ]))
+  Route.resource('product', 'ProductController').apiOnly()
+  Route.resource('coupon', 'CouponController').apiOnly()
+  Route.resource('order', 'OrderController').apiOnly()
+  Route.post('images/bulkUpload', 'ImageController.bulkUpload')
+})
+  .prefix('api/admin')
   .namespace('Admin')
   .middleware(['auth', 'is:(admin || manager) && !client'])

@@ -5,9 +5,8 @@
 /** @typedef {import('@adonisjs/framework/src/View')} View */
 
 const Category = use('App/Models/Category')
-const Helpers = use('Helpers')
 const Image = use('App/Models/Image')
-const { str_random } = use('App/Helpers')
+const { manage_single_upload } = use('App/Helpers')
 const Database = use('Database')
 
 /**
@@ -39,9 +38,12 @@ class CategoryController {
    * @param {Response} ctx.response
    */
   async store({ request, response }) {
+    const transaction = await Database.beginTransaction()
     try {
-      const transaction = await Database.beginTransaction()
       const { title, description } = request.all() //poderia ser request.body
+      const category = new Category()
+      category.title = title
+      category.description = description
 
       // tratamento da imagem
       const image = request.file('image', {
@@ -49,28 +51,22 @@ class CategoryController {
         size: '2mb'
       })
 
-      // gera um nome aleatório
-      const random_name = await str_random(30)
-      let filename = `${new Date().getTime()}_${random_name}.${image.subtype}`
+      let file = {}
 
-      // renomeia o arquivo e move para public/uploads
-      await image.move(Helpers.publicPath('uploads'), {
-        name: filename
-      })
-
-      // verifica se foi movido e retorna o erro
-      if (!image.moved()) {
-        throw image.error()
+      if (image) {
+        file = await manage_single_upload(image)
+        if (file.moved()) {
+          const category_image = await Image.create({
+            path: file.fileName,
+            size: file.size,
+            original_name: file.clientName,
+            extension: file.subtype
+          }, transaction)
+          category.image_id = category_image.id
+        }
       }
 
-      const category_image = await Image.create({
-        path: filename,
-        size: image.size,
-        original_name: image.clientName,
-        extension: image.subtype
-      }, transaction)
-
-      const category = await Category.create({ title, description, image_id: category_image.id }, transaction)
+      await category.save(transaction)
 
       await transaction.commit()
       return response.status(201).send(category)
@@ -93,18 +89,8 @@ class CategoryController {
    * @param {View} ctx.view
    */
   async show({ params, request, response, view }) {
-  }
-
-  /**
-   * Render a form to update an existing category.
-   * GET categories/:id/edit
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async edit({ params, request, response, view }) {
+    const category = await Category.findOrFail(params.id)
+    return response.send(category)
   }
 
   /**
@@ -116,6 +102,42 @@ class CategoryController {
    * @param {Response} ctx.response
    */
   async update({ params, request, response }) {
+    const transaction = await Database.beginTransaction()
+    try {
+      const category = await Category.findOrFail(params.id)
+      // para filtrar troca o .all() por .only(['title', 'description', ...])
+      category.merge(request.all())
+
+      // tratamento da imagem
+      const image = request.file('image', {
+        types: ['image'],
+        size: '2mb'
+      })
+
+      if (image) {
+        let file = await manage_single_upload(image)
+        if (file.moved()) {
+          const category_image = await Image.create({
+            path: file.fileName,
+            size: file.size,
+            original_name: file.clientName,
+            extension: file.subtype
+          },
+            transaction
+          )
+          category.image_id = category_image.id
+        }
+      }
+
+      await category.save(transaction)
+      await transaction.commit()
+      return response.send(category)
+    } catch (e) {
+      await transaction.rollback()
+      return response
+        .status(400)
+        .send({ message: "Erro ao processar sua requisição!", error: e.message })
+    }
   }
 
   /**
@@ -127,6 +149,13 @@ class CategoryController {
    * @param {Response} ctx.response
    */
   async destroy({ params, request, response }) {
+    const category = await Category.find(params.id)
+    category.delete()
+    // status de delete com exito é 200, mas se deixar sem status ele vai retornar 200, então...
+    return response.send({
+      status: "sucesso",
+      message: "Categoria deletada com sucesso."
+    })
   }
 }
 
