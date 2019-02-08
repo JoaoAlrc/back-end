@@ -55,8 +55,11 @@ Route.group(() => {
   Route.resource('product', 'ProductController').apiOnly()
   Route.resource('coupon', 'CouponController').apiOnly()
   Route.resource('order', 'OrderController').apiOnly()
-  Route.post('images/bulkUpload', 'ImageController.bulkUpload')
+  Route.resource('image', 'ImageController').apiOnly()
+  Route
+    .post('images/bulkUpload', 'ImageController.bulkUpload')
+    .as('image.bulkUpload')
 })
   .prefix('api/admin')
   .namespace('Admin')
-  .middleware(['auth', 'is:(admin || manager) && !client'])
+  .middleware(['auth', 'is:(admin || manager)'])

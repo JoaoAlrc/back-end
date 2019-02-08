@@ -2,9 +2,12 @@
 
 const { manage_multiple_uploads } = use('App/Helpers')
 const Image = use('App/Models/Image')
+const fs = use('fs')
+const Helpers = use('Helpers')
+
 class ImageController {
     async bulkUpload({ request, response }) {
-        const fileJar = request.file('files', {
+        const fileJar = request.file('images', {
             types: ['image'],
             size: '2mb'
         })
@@ -26,6 +29,73 @@ class ImageController {
             successes: images,
             errors: files.errors
         })
+    }
+
+    async index({ request, response }) {
+        let image = await Image.query().paginate()
+        return response.send(image)
+    }
+
+    async store({ request, response }) {
+        try {
+            // tratamento da imagem
+            const image = request.file('image', {
+                types: ['image'],
+                size: '2mb'
+            })
+
+            let file = {}
+
+            if (image) {
+                file = await manage_single_upload(image)
+                if (file.moved()) {
+                    const img = await Image.create({
+                        path: file.fileName,
+                        size: file.size,
+                        original_name: file.clientName,
+                        extension: file.subtype
+                    })
+                    return response.status(201).send(img)
+                }
+            }
+            return response
+                .status(400)
+                .send({ message: "Não foi possível processar esta imagem." })
+
+        } catch (e) {
+            return response
+                .status(500)
+                .send({
+                    message: "Não foi possível processar a sua solicitação.",
+                    error: e.message
+                })
+        }
+    }
+
+    async show({ request, response, params }) {
+        let image = await Image.find(params.id)
+        return response.send(image)
+    }
+
+    async destroy({ request, response, params }) {
+        let image = await Image.findOrFail(params.id)
+        try {
+            let filePath = Helpers.publicPath(`uploads/${image.path}`)
+            await fs.unlink(filePath, err => {
+                if (err) throw err
+            })
+            await image.delete()
+            return response
+                .status(410)
+                .send({ message: 'Imagem deletada com sucesso!' })
+        } catch (e) {
+            return response
+                .status(400)
+                .send({
+                    message: "Não foi possível processar a sua solicitação.",
+                    error: e.message
+                })
+        }
     }
 }
 
