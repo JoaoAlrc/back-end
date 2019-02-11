@@ -10,7 +10,6 @@ class ProductSchema extends Schema {
       table.string('brand', 80).notNullable()
       table.string('name', 200).notNullable()
       table.text('description')
-      table.integer('stock').unsigned().defaultTo(0)
       table.decimal('price', 12, 2).notNullable()
       table.timestamps()
     })

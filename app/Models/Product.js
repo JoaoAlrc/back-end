@@ -6,8 +6,8 @@ const Model = use('Model')
 class Product extends Model {
     // relacionamento entre o produto e as imagens
 
-    images() {
-        return this.belongsToMany('App/Models/Image')
+    image() {
+        return this.belongsTo('App/Models/Image')
     }
 
     // relacionamento entre Products e Category

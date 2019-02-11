@@ -8,6 +8,7 @@ const Category = use('App/Models/Category')
 const Image = use('App/Models/Image')
 const { manage_single_upload } = use('App/Helpers')
 const Database = use('Database')
+const Transformer = use('App/Transformers/Category/CategoriesTransformer')
 
 /**
  * Resourceful controller for interacting with categories
@@ -21,12 +22,13 @@ class CategoryController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    * @param {View} ctx.view
+   * @param {transform} ctx.transform
    */
-  async index({ request, response, view }) {
+  async index({ request, response, view, transform }) {
     const categories = await Category
       .query()
       .paginate()
-    return response.send(categories)
+    return response.send(await transform.paginate(categories, Transformer))
   }
 
   /**
@@ -37,7 +39,7 @@ class CategoryController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async store({ request, response }) {
+  async store({ request, response, transform }) {
     const transaction = await Database.beginTransaction()
     try {
       const { title, description } = request.all() //poderia ser request.body
@@ -69,7 +71,7 @@ class CategoryController {
       await category.save(transaction)
 
       await transaction.commit()
-      return response.status(201).send(category)
+      return response.status(201).send(await transform.item(category, Transformer))
     } catch (e) {
       await transaction.rollback()
       return response.status(400).send({
@@ -88,9 +90,9 @@ class CategoryController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async show({ params, request, response, view }) {
+  async show({ params, request, response, transform }) {
     const category = await Category.findOrFail(params.id)
-    return response.send(category)
+    return response.send(await transform.item(category, Transformer))
   }
 
   /**
@@ -101,7 +103,7 @@ class CategoryController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async update({ params, request, response }) {
+  async update({ params, request, response, transform }) {
     const transaction = await Database.beginTransaction()
     try {
       const category = await Category.findOrFail(params.id)
@@ -131,7 +133,7 @@ class CategoryController {
 
       await category.save(transaction)
       await transaction.commit()
-      return response.send(category)
+      return response.send(await transform.item(category, Transformer))
     } catch (e) {
       await transaction.rollback()
       return response

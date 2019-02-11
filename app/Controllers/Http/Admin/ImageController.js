@@ -4,9 +4,10 @@ const { manage_multiple_uploads } = use('App/Helpers')
 const Image = use('App/Models/Image')
 const fs = use('fs')
 const Helpers = use('Helpers')
+const Transformer = use('App/Transformers/Image/ImageTransformer')
 
 class ImageController {
-    async bulkUpload({ request, response }) {
+    async bulkUpload({ request, response, transform }) {
         const fileJar = request.file('images', {
             types: ['image'],
             size: '2mb'
@@ -25,6 +26,7 @@ class ImageController {
                 images.push(image)
             })
         )
+        images = await transform.collection(images, Transformer)
         return response.status(201).send({
             successes: images,
             errors: files.errors
@@ -36,7 +38,7 @@ class ImageController {
         return response.send(image)
     }
 
-    async store({ request, response }) {
+    async store({ request, response, transform }) {
         try {
             // tratamento da imagem
             const image = request.file('image', {
@@ -55,7 +57,7 @@ class ImageController {
                         original_name: file.clientName,
                         extension: file.subtype
                     })
-                    return response.status(201).send(img)
+                    return response.status(201).send(await transform.item(img, Transformer))
                 }
             }
             return response
@@ -72,9 +74,9 @@ class ImageController {
         }
     }
 
-    async show({ request, response, params }) {
+    async show({ request, response, params, transform }) {
         let image = await Image.find(params.id)
-        return response.send(image)
+        return response.send(await transform.item(image, Transformer))
     }
 
     async destroy({ request, response, params }) {
