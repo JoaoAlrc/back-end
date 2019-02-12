@@ -9,16 +9,16 @@ const TransformerAbstract = use('Adonis/Addons/Bumblebee/TransformerAbstract')
  * @constructor
  */
 class ProductImageTransformer extends TransformerAbstract {
-  /**
-   * This method is used to transform the data.
-   */
-  transform(image) {
-    image = image.toJSON()
-    return {
-      id: image.id,
-      url: image.url
+    /**
+     * This method is used to transform the data.
+     */
+    transform(image) {
+        image = image.toJSON()
+        return {
+            id: image.id,
+            url: image.url
+        }
     }
-  }
 }
 
 module.exports = ProductImageTransformer

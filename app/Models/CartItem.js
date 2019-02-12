@@ -12,11 +12,11 @@ class CartItem extends Model {
         return this.belongsTo('App/Models/Cart')
     }
 
-    static get createdAtColumn(){
+    static get createdAtColumn() {
         return null
     }
 
-    static get updatedAtColumn(){
+    static get updatedAtColumn() {
         return null
     }
 }

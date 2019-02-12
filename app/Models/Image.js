@@ -10,7 +10,6 @@ class Image extends Model {
     }
 
     getUrl({ path }) {
-        // Env.get é um helper do adonis que recupera info do .env
         return `${Env.get('APP_URL')}/uploads/${path}`
     }
 }

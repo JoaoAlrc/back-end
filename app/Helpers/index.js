@@ -2,14 +2,14 @@
 
 const crypto = use('crypto')
 const Helpers = use('Helpers')
+// const fs = use('fs')
 
 /**
- * gera uma string random
- * 
- * @param { int } length - o tamanho da string
- * @return { string } o resultado
+ * Generate random aplhanumeric string
+ *
+ * @param { int } length -  The length of the string
+ * @return { string }       The Result
  */
-
 const str_random = async (length = 40) => {
     let string = ''
     let len = string.length
@@ -27,13 +27,18 @@ const str_random = async (length = 40) => {
     return string
 }
 
+/**
+ * Move a given file for the spcified path, if none is specified, move file to 'public/uploads' path.
+ * @param {FileJar} file
+ * @param {string} path
+ */
 const manage_single_upload = async (file, path = null) => {
     path = path ? path : Helpers.publicPath('uploads')
     // gera um nome aleatório
     const random_name = await str_random(30)
-    let filename = `${new Date().getTime()}_${random_name}.${file.subtype}`
+    let filename = `${new Date().getTime()}-${random_name}.${file.subtype}`
 
-    // renomeia o arquivo e move para public/uploads
+    // renomeia o arquivo e move para a pasta public/uploads
     await file.move(path, {
         name: filename
     })
@@ -41,6 +46,12 @@ const manage_single_upload = async (file, path = null) => {
     return file
 }
 
+/**
+ * Move a given file list for the spcified path, if none is specified, move files to 'public/uploads' path.
+ * @param {Filejar} fileJar
+ * @param {string} path
+ * @return { object }
+ */
 const manage_multiple_uploads = async (fileJar, path = null) => {
     path = path ? path : Helpers.publicPath('uploads')
     let successes = []
@@ -49,8 +60,9 @@ const manage_multiple_uploads = async (fileJar, path = null) => {
     await Promise.all(
         fileJar.files.map(async file => {
             let random_name = await str_random(30)
-            let filename = `${new Date().getTime()}-${random_name}.${file.subtype}`
-
+            let filename = `${new Date().getTime()}-${random_name}.${
+                file.subtype
+            }`
             await file.move(path, {
                 name: filename
             })

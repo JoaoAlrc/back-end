@@ -10,26 +10,24 @@ const ImageTransformer = use('App/Transformers/Product/ProductImageTransformer')
  * @constructor
  */
 class ProductTransformer extends TransformerAbstract {
-  defaultInclude() {
-    return ['image']
-  }
-  /**
-   * This method is used to transform the data.
-   */
-  transform(product) {
-    return {
-      // add your transformation object here
-      id: product.id,
-      brand: product.brand,
-      name: product.name,
-      description: product.description,
-      price: product.price
+    defaultInclude() {
+        return ['images']
     }
-  }
+    /**
+     * This method is used to transform the data.
+     */
+    transform(product) {
+        return {
+            id: product.id,
+            name: product.name,
+            description: product.description,
+            price: product.price
+        }
+    }
 
-  includeImage(product) {
-    return this.item(product.getRelated('image'), ImageTransformer)
-  }
+    includeImages(product) {
+        return this.collection(product.getRelated('images'), ImageTransformer)
+    }
 }
 
 module.exports = ProductTransformer

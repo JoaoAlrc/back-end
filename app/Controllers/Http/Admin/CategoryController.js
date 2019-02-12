@@ -9,156 +9,161 @@ const Image = use('App/Models/Image')
 const { manage_single_upload } = use('App/Helpers')
 const Database = use('Database')
 const Transformer = use('App/Transformers/Category/CategoriesTransformer')
-
 /**
  * Resourceful controller for interacting with categories
  */
 class CategoryController {
-  /**
-   * Show a list of all categories.
-   * GET categories
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   * @param {transform} ctx.transform
-   */
-  async index({ request, response, view, transform }) {
-    const categories = await Category
-      .query()
-      .paginate()
-    return response.send(await transform.paginate(categories, Transformer))
-  }
-
-  /**
-   * Create/save a new category.
-   * POST categories
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
-  async store({ request, response, transform }) {
-    const transaction = await Database.beginTransaction()
-    try {
-      const { title, description } = request.all() //poderia ser request.body
-      const category = new Category()
-      category.title = title
-      category.description = description
-
-      // tratamento da imagem
-      const image = request.file('image', {
-        types: ['image'],
-        size: '2mb'
-      })
-
-      let file = {}
-
-      if (image) {
-        file = await manage_single_upload(image)
-        if (file.moved()) {
-          const category_image = await Image.create({
-            path: file.fileName,
-            size: file.size,
-            original_name: file.clientName,
-            extension: file.subtype
-          }, transaction)
-          category.image_id = category_image.id
-        }
-      }
-
-      await category.save(transaction)
-
-      await transaction.commit()
-      return response.status(201).send(await transform.item(category, Transformer))
-    } catch (e) {
-      await transaction.rollback()
-      return response.status(400).send({
-        message: "Erro ao processar sua requisição.",
-        error: e.message
-      })
+    /**
+     * Show a list of all categories.
+     * GET categories
+     *
+     * @param {object} ctx
+     * @param {Request} ctx.request
+     * @param {Response} ctx.response
+     * @param {View} ctx.view
+     * @param { transform } ctx.transform
+     */
+    async index({ response, transform, pagination }) {
+        const categories = await Category.query().paginate(
+            pagination.page,
+            pagination.perpage
+        )
+        return response.send(await transform.paginate(categories, Transformer))
     }
-  }
 
-  /**
-   * Display a single category.
-   * GET categories/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async show({ params, request, response, transform }) {
-    const category = await Category.findOrFail(params.id)
-    return response.send(await transform.item(category, Transformer))
-  }
+    /**
+     * Create/save a new category.
+     * POST categories
+     *
+     * @param {object} ctx
+     * @param {Request} ctx.request
+     * @param {Response} ctx.response
+     */
+    async store({ request, response, transform }) {
+        const transaction = await Database.beginTransaction()
+        try {
+            const { title, description } = request.all()
 
-  /**
-   * Update category details.
-   * PUT or PATCH categories/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
-  async update({ params, request, response, transform }) {
-    const transaction = await Database.beginTransaction()
-    try {
-      const category = await Category.findOrFail(params.id)
-      // para filtrar troca o .all() por .only(['title', 'description', ...])
-      category.merge(request.all())
+            const category = new Category()
+            category.title = title
+            category.description = description
 
-      // tratamento da imagem
-      const image = request.file('image', {
-        types: ['image'],
-        size: '2mb'
-      })
+            // Tratamento da imagem
+            const image = request.file('image', {
+                types: ['image'],
+                size: '2mb'
+            })
 
-      if (image) {
-        let file = await manage_single_upload(image)
-        if (file.moved()) {
-          const category_image = await Image.create({
-            path: file.fileName,
-            size: file.size,
-            original_name: file.clientName,
-            extension: file.subtype
-          },
-            transaction
-          )
-          category.image_id = category_image.id
+            let file = {}
+            if (image) {
+                file = await manage_single_upload(image)
+                if (file.moved()) {
+                    const category_image = await Image.create(
+                        {
+                            path: file.fileName,
+                            size: file.size,
+                            original_name: file.clientName,
+                            extension: file.subtype
+                        },
+                        transaction
+                    )
+                    category.image_id = category_image.id
+                }
+            }
+
+            await category.save(transaction)
+            await transaction.commit()
+
+            return response
+                .status(201)
+                .send(await transform.item(category, Transformer))
+        } catch (e) {
+            await transaction.rollback()
+            return response.status(400).send({
+                message: 'Erro ao processar sua requisição',
+                error: e.message
+            })
         }
-      }
-
-      await category.save(transaction)
-      await transaction.commit()
-      return response.send(await transform.item(category, Transformer))
-    } catch (e) {
-      await transaction.rollback()
-      return response
-        .status(400)
-        .send({ message: "Erro ao processar sua requisição!", error: e.message })
     }
-  }
 
-  /**
-   * Delete a category with id.
-   * DELETE categories/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
-  async destroy({ params, request, response }) {
-    const category = await Category.find(params.id)
-    category.delete()
-    // status de delete com exito é 200, mas se deixar sem status ele vai retornar 200, então...
-    return response.send({
-      status: "sucesso",
-      message: "Categoria deletada com sucesso."
-    })
-  }
+    /**
+     * Display a single category.
+     * GET categories/:id
+     *
+     * @param {object} ctx
+     * @param {Request} ctx.request
+     * @param {Response} ctx.response
+     * @param {View} ctx.view
+     */
+    async show({ params, response, transform }) {
+        const category = await Category.findOrFail(params.id)
+        return response.send(await transform.item(category, Transformer))
+    }
+
+    /**
+     * Update category details.
+     * PUT or PATCH categories/:id
+     *
+     * @param {object} ctx
+     * @param {Request} ctx.request
+     * @param {Response} ctx.response
+     */
+    async update({ params, request, response, transform }) {
+        const transaction = await Database.beginTransaction()
+        try {
+            const category = await Category.findOrFail(params.id)
+            category.merge(request.all())
+
+            // Tratamento da imagem
+            const image = request.file('image', {
+                types: ['image'],
+                size: '2mb'
+            })
+
+            if (image) {
+                let file = await manage_single_upload(image)
+                if (file.moved()) {
+                    const category_image = await Image.create(
+                        {
+                            path: file.fileName,
+                            size: file.size,
+                            original_name: file.clientName,
+                            extension: file.subtype
+                        },
+                        transaction
+                    )
+                    category.image_id = category_image.id
+                }
+            }
+
+            await category.save(transaction)
+            await transaction.commit()
+            return response.send(await transform.item(category, Transformer))
+        } catch (e) {
+            await transaction.rollback()
+            return response.status(400).send({
+                message: 'Erro ao processar sua requisição!',
+                error: e.message
+            })
+        }
+    }
+
+    /**
+     * Delete a category with id.
+     * DELETE categories/:id
+     *
+     * @param {object} ctx
+     * @param {Request} ctx.request
+     * @param {Response} ctx.response
+     */
+    async destroy({ params, response }) {
+        const category = await Category.find(params.id)
+        category.delete()
+        return response.send({
+            status: 'sucesso',
+            message: 'Categoria deletada com sucesso'
+        })
+    }
 }
 
 module.exports = CategoryController

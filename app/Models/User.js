@@ -7,60 +7,62 @@ const Model = use('Model')
 const Hash = use('Hash')
 
 class User extends Model {
-  static boot() {
-    super.boot()
+    static boot() {
+        super.boot()
+
+        /**
+         * A hook to hash the user password before saving
+         * it to the database.
+         */
+        this.addHook('beforeSave', async userInstance => {
+            if (userInstance.dirty.password) {
+                userInstance.password = await Hash.make(userInstance.password)
+            }
+        })
+    }
 
     /**
-     * A hook to hash the user password before saving
-     * it to the database.
+     * Oculta os campos definidos como ocultos, das queries no DB
      */
-    this.addHook('beforeSave', async (userInstance) => {
-      if (userInstance.dirty.password) {
-        userInstance.password = await Hash.make(userInstance.password)
-      }
-    })
-  }
+    static get hidden() {
+        return ['password']
+    }
 
-  //oculta os campos definidos como ocultos, das queries no DB
-  static get hidden() {
-    return [
-      'password'
-    ]
-  }
+    /**
+     * User Traits
+     */
+    static get traits() {
+        return [
+            '@provider:Adonis/Acl/HasRole',
+            '@provider:Adonis/Acl/HasPermission'
+        ]
+    }
 
-  //User Traits
-  static get traits() {
-    return [
-      '@provider:Adonis/Acl/HasRole',
-      '@provider:Adonis/Acl/HasPermission'
-    ]
-  }
+    /**
+     * A relationship on tokens is required for auth to
+     * work. Since features like `refreshTokens` or
+     * `rememberToken` will be saved inside the
+     * tokens table.
+     *
+     * @method tokens
+     *
+     * @return {Object}
+     */
+    tokens() {
+        return this.hasMany('App/Models/Token')
+    }
 
-  /**
-   * A relationship on tokens is required for auth to
-   * work. Since features like `refreshTokens` or
-   * `rememberToken` will be saved inside the
-   * tokens table.
-   *
-   * @method tokens
-   *
-   * @return {Object}
-   */
-  tokens() {
-    return this.hasMany('App/Models/Token')
-  }
+    image() {
+        return this.belongsTo('App/Models/Image')
+    }
 
-  image() {
-    return this.belongsTo('App/Models/Image')
-  }
+    coupons() {
+        return this.belongsToMany('App/Models/Coupon')
+    }
 
-  coupons() {
-    return this.belongsToMany('App/Models/Coupon')
-  }
-
-  carts() {
-    return this.hasMany('App/Models/Cart')
-  }
+    carts() {
+        return this.hasMany('App/Models/Cart')
+    }
 }
 
 module.exports = User

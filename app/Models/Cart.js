@@ -4,19 +4,19 @@
 const Model = use('Model')
 
 class Cart extends Model {
-    user(){
+    user() {
         return this.belongsTo('App/Models/User')
     }
 
-    items(){
+    items() {
         return this.hasMany('App/Models/CartItem')
     }
 
-    static get createdAtColumn(){
+    static get createdAtColumn() {
         return null
     }
 
-    static get updatedAtColumn(){
+    static get updatedAtColumn() {
         return null
     }
 }

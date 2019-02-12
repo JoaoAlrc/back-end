@@ -7,33 +7,35 @@ const Database = use('Database')
 class AuthController {
     async register({ request, response }) {
         const trx = await Database.beginTransaction()
-        try {
-            // request.body daria na mesma
-            const { username, name, surname, birthdate, cpf, email, password, address, addressNum, neighborhood, city, state, zipCode } = request.all()
 
-            const user = await User.create({ username, name, surname, birthdate, cpf, email, password, address, addressNum, neighborhood, city, state, zipCode }, trx)
+        try {
+            const { name, surname, email, password } = request.all()
+
+            const user = await User.create(
+                { name, surname, email, password },
+                trx
+            )
 
             const userRole = await Role.findBy('slug', 'client')
 
-            // associa o userRole ao User
+            // Associa o userRole ao User
             await user.roles().attach([userRole.id], null, trx)
 
             await trx.commit()
-
             return response.status(201).send({ data: user })
         } catch (e) {
             await trx.rollback()
-            return response.status(400).send({ message: "Erro ao realizar cadastro.", message: e.message })
+            return response.status(400).send({
+                message: 'Erro ao realizar cadastro',
+                message: e.message
+            })
         }
     }
 
     async login({ request, response, auth }) {
         const { email, password } = request.all()
 
-        const user = await auth
-            .authenticator('jwt')
-            .withRefreshToken()
-            .attempt(email, password)
+        const user = await auth.withRefreshToken().attempt(email, password)
 
         return response.send({ data: user })
     }
@@ -63,7 +65,7 @@ class AuthController {
             .authenticator('jwt')
             .revokeTokens([refresh_token], true)
 
-        return response.send({ message: "User Logged Out!" })
+        return response.send({ message: 'User Logged Out!' })
     }
 }
 

@@ -4,20 +4,23 @@
 const Model = use('Model')
 
 class Product extends Model {
-    // relacionamento entre o produto e as imagens
-
-    image() {
-        return this.belongsTo('App/Models/Image')
+    /**
+     * Relacionamento entre o produto e as imagens
+     */
+    images() {
+        return this.belongsToMany('App/Models/Image')
     }
 
-    // relacionamento entre Products e Category
-
+    /**
+     * Relacionamento entre Produto e Categorias
+     */
     categories() {
         return this.belongsToMany('App/Models/Category')
     }
 
-    // relacionamento entre produtos e cupons de desconto
-
+    /**
+     * Relacionamento entre produtos e cupons de descontos
+     */
     coupons() {
         return this.belongsToMany('App/Models/Coupon')
     }
