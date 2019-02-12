@@ -35,7 +35,7 @@ class ProductController {
     async store({ request, response, transform }) {
         const transaction = await Database.beginTransaction()
         try {
-            let product = request.only(['name', 'description', 'price'])
+            let product = request.only(['brand', 'name', 'description', 'price'])
             const { images } = request.only(['images'])
             product = await Product.create(product, transaction)
             await product.images().attach(images, null, transaction)
@@ -75,7 +75,7 @@ class ProductController {
         const transaction = await Database.beginTransaction()
         const product = await Product.findOrFail(params.id)
         try {
-            const data = request.only(['name', 'description', 'price'])
+            const data = request.only(['brand', 'name', 'description', 'price'])
             const { images } = request.only(['images'])
             product.merge(data)
             await product.save(transaction)

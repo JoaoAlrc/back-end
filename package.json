@@ -1,8 +1,8 @@
 {
-    "name": "adonis-ecommerce-realtime",
+    "name": "anúbis-backend",
     "version": "4.1.0",
     "adonis-version": "4.1.0",
-    "description": "Adonis API Server for E-commerce realtime application",
+    "description": "Adonis API Server for the Anúbis Backend",
     "main": "index.js",
     "scripts": {
         "start": "node server.js",
@@ -13,7 +13,7 @@
         "adonisjs",
         "adonis-app"
     ],
-    "author": "Thauan Santos",
+    "author": "João Victor Alarcão Pereira",
     "license": "MIT",
     "private": true,
     "dependencies": {

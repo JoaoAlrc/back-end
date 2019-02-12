@@ -1,8 +1,4 @@
-# Ecommerce Realtime Com AdonisJS, Node.JS e MySQL
-
-![E-Commerce Real Time Com Adonis, Node.js e MySQL](thumbnail.jpg)
-
-Esta aplicação está em desenvolvimento, caso tenha interesse em saber como ela foi criada acesse: [https://www.udemy.com/e-commerce-em-tempo-real-com-nodejs-adonis-e-websocket/](https://www.udemy.com/e-commerce-em-tempo-real-com-nodejs-adonis-e-websocket/)
+# Anúbis Backend Com AdonisJS, Node.JS e MySQL
 
 ## Pacotes inclusos
 
@@ -23,8 +19,8 @@ Para executar esta aplicação em modo desenvolvimento você precisa ter o pacot
 > Development
 
 ```bash
-    git clone git@github.com:NeroOficial/ecommerce-realtime.git
-    cd ecommerce-realtime
+    git clone --dissociate https://github.com/JoaoAlrc/back-end.git
+    cd back-end
     npm install
     adonis serve --dev
 ```
@@ -32,8 +28,8 @@ Para executar esta aplicação em modo desenvolvimento você precisa ter o pacot
 > Production
 
 ```bash
-    git clone git@github.com:NeroOficial/ecommerce-realtime.git
-    cd ecommerce-realtime
+    git clone --dissociate https://github.com/JoaoAlrc/back-end.git
+    cd back-end
     npm install
     npm start
 ```
@@ -41,7 +37,7 @@ Para executar esta aplicação em modo desenvolvimento você precisa ter o pacot
 Saída do terminal:
 
 ```bash
-> adonis-ecommerce-realtime@4.1.0 start /path/to/ecommerce-realtime
+> adonis-back-end@4.1.0 start /path/to/back-end
 > node server.js
 > info: serving app on http://127.0.0.1:3333
 ```
