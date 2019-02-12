@@ -16,6 +16,9 @@ module.exports = {
   */
 
     name: Env.get('APP_NAME', 'AdonisJs'),
+    category_path: Env.get('UPLOAD_STORAGE_CATEGORIES', 'public/uploads'),
+    product_path: Env.get('UPLOAD_STORAGE_PRODUCTS', 'public/uploads'),
+    user_path: Env.get('UPLOAD_STORAGE_USERS', 'public/uploads'),
 
     /*
   |--------------------------------------------------------------------------

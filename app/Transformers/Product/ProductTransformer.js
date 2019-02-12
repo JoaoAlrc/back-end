@@ -19,6 +19,7 @@ class ProductTransformer extends TransformerAbstract {
     transform(product) {
         return {
             id: product.id,
+            brand: product.brand,
             name: product.name,
             description: product.description,
             price: product.price
