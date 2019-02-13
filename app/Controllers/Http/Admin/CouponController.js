@@ -4,6 +4,8 @@ const Coupon = use('App/Models/Coupon')
 const Transformer = use('App/Transformers/Coupon/CouponTransformer')
 const Database = use('Database')
 const Service = use('App/Services/Coupon/CouponService')
+// No crud de cupons pt 2 explica o envio de users, orders e products
+
 /**
  * Resourceful controller for interacting with coupons
  */

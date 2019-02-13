@@ -35,7 +35,7 @@ Route.group(() => {
         .middleware(['auth'])
         .validator('Clients/ClientRefreshToken')
 })
-    .prefix('v1/auth')
+    .prefix('api/v1/auth')
     .namespace('Auth')
 
 // Administration Routes
@@ -65,6 +65,6 @@ Route.group(() => {
             ])
         )
 })
-    .prefix('v1/admin')
+    .prefix('api/v1/admin')
     .namespace('Admin')
     .middleware(['auth', 'is:(admin || manager)'])

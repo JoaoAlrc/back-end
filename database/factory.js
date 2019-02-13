@@ -17,10 +17,19 @@ const Factory = use('Factory')
 // Client Blueprint
 Factory.blueprint('App/Models/User', faker => {
     return {
+        username: faker.first(),
         name: faker.first(),
         surname: faker.last(),
-        email: faker.email({ domain: 'fsocietybrasil.org' }),
-        password: 'secret'
+        birthdate: faker.birthday(),
+        cpf: faker.cpf(),
+        email: faker.email({ domain: 'anubis.com.br' }),
+        password: 'secret',
+        address: faker.sentence({ words: 5 }),
+        addressNum: faker.sentence({ words: 2 }),
+        neighborhood: faker.word({ length: 9 }),
+        city: faker.word({ length: 9 }),
+        state: faker.word({ length: 2 }),
+        zipCode: faker.string({ length: 9 })
     }
 })
 
