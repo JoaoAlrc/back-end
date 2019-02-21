@@ -33,11 +33,19 @@ class UserController {
      */
     async store({ request, response, transform }) {
         const data = request.only([
-            'name',
-            'surname',
-            'email',
-            'password',
-            'image_id'
+            "username",
+            "name",
+            "surname",
+            "birthdate",
+            "cpf",
+            "email",
+            "password",
+            "address",
+            "addressNum",
+            "neighborhood",
+            "city",
+            "state",
+            "zipCode"
         ])
 
         const user = await User.create(data)
@@ -72,11 +80,19 @@ class UserController {
     async update({ params, request, transform }) {
         const user = await User.findOrFail(params.id)
         const data = request.only([
-            'name',
-            'surname',
-            'email',
-            'password',
-            'image_id'
+            "username",
+            "name",
+            "surname",
+            "birthdate",
+            "cpf",
+            "email",
+            "password",
+            "address",
+            "addressNum",
+            "neighborhood",
+            "city",
+            "state",
+            "zipCode"
         ])
 
         user.merge(data)

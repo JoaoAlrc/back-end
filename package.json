@@ -1,5 +1,5 @@
 {
-    "name": "anúbis-backend",
+    "name": "anubis-backend",
     "version": "4.1.0",
     "adonis-version": "4.1.0",
     "description": "Adonis API Server for the Anúbis Backend",

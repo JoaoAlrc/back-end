@@ -9,10 +9,36 @@ class AuthController {
         const trx = await Database.beginTransaction()
 
         try {
-            const { name, surname, email, password } = request.all()
+            const { username,
+                name,
+                surname,
+                birthdate,
+                cpf,
+                email,
+                password,
+                address,
+                addressNum,
+                neighborhood,
+                city,
+                state,
+                zipCode } = request.all()
 
             const user = await User.create(
-                { name, surname, email, password },
+                {
+                    username,
+                    name,
+                    surname,
+                    birthdate,
+                    cpf,
+                    email,
+                    password,
+                    address,
+                    addressNum,
+                    neighborhood,
+                    city,
+                    state,
+                    zipCode
+                },
                 trx
             )
 

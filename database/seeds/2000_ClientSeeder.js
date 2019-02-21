@@ -35,7 +35,7 @@ class ClientSeeder {
             surname: "alarcão p",
             birthdate: "1995-12-22",
             cpf: "050.002.471-58",
-            email: "jv.alarcao@hotmail.com",
+            email: "jv@anubis.com",
             password: "1234",
             address: "condo",
             addressNum: "21",

@@ -9,6 +9,7 @@ class OrdersSchema extends Schema {
             table.increments()
             table.decimal('total', 12, 2).defaultTo(0.0)
             table.integer('user_id').unsigned()
+            table.integer('table_id').unsigned()
             table
                 .enu('status', ['pending', 'cancelled', 'shipped', 'paid'])
                 .defaultTo('pending')
@@ -19,6 +20,11 @@ class OrdersSchema extends Schema {
                 .foreign('user_id')
                 .references('id')
                 .inTable('users')
+                .onDelete('CASCADE')
+            table
+                .foreign('table_id')
+                .references('id')
+                .inTable('bar_tables')
                 .onDelete('CASCADE')
         })
     }
