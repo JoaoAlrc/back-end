@@ -22,7 +22,8 @@ class ProductTransformer extends TransformerAbstract {
             brand: product.brand,
             name: product.name,
             description: product.description,
-            price: product.price
+            price: product.price,
+            category_id: product.category_id
         }
     }
 

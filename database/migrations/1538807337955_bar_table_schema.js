@@ -5,7 +5,7 @@ const Schema = use('Schema')
 
 class BarSchema extends Schema {
   up() {
-    this.create('tables', (table) => {
+    this.create('bar_tables', (table) => {
       table.increments()
       table.integer('bar_id').unsigned()
       table.timestamps()
@@ -19,7 +19,7 @@ class BarSchema extends Schema {
   }
 
   down() {
-    this.drop('tables')
+    this.drop('bar_tables')
   }
 }
 

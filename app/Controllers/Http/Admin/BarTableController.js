@@ -1,5 +1,9 @@
 'use strict'
 
+const BarTable = use('App/Models/BarTable')
+const Transformer = use('App/Transformers/BarTable/BarTableTransformer')
+const Database = use('Database')
+
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
 /** @typedef {import('@adonisjs/framework/src/View')} View */
@@ -17,20 +21,13 @@ class BarTableController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async index ({ request, response, view }) {
-  }
-
-  /**
-   * Render a form to be used for creating a new bartable.
-   * GET bartables/create
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async create ({ request, response, view }) {
-  }
+  async index ({ response, transform, pagination }) {
+    const table = await BarTable.query().paginate(
+        pagination.page,
+        pagination.perpage
+    )
+    return response.send(await transform.paginate(table, Transformer))
+}
 
   /**
    * Create/save a new bartable.
@@ -40,7 +37,19 @@ class BarTableController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async store ({ request, response }) {
+  async store ({ request, response, transform }) {
+    const transaction = await Database.beginTransaction()
+    try {
+      let barTable = request.only(['bar_id'])
+      barTable = await BarTable.create(barTable, transaction)
+      await transaction.commit()
+      return response
+        .status(201)
+        .send(await transform.item(barTable, Transformer))
+    } catch (error) {
+      await transaction.rollback()
+      return response.status(error.status).send(error)
+    }
   }
 
   /**
@@ -53,18 +62,6 @@ class BarTableController {
    * @param {View} ctx.view
    */
   async show ({ params, request, response, view }) {
-  }
-
-  /**
-   * Render a form to update an existing bartable.
-   * GET bartables/:id/edit
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async edit ({ params, request, response, view }) {
   }
 
   /**

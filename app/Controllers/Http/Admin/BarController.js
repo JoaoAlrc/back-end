@@ -1,5 +1,9 @@
 'use strict'
 
+const Bar = use('App/Models/Bar')
+const Transformer = use('App/Transformers/Bar/BarTransformer')
+const Database = use('Database')
+
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
 /** @typedef {import('@adonisjs/framework/src/View')} View */
@@ -17,19 +21,12 @@ class BarController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async index ({ request, response, view }) {
-  }
-
-  /**
-   * Render a form to be used for creating a new bar.
-   * GET bars/create
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async create ({ request, response, view }) {
+  async index({ response, transform, pagination }) {
+    const bar = await Bar.query().paginate(
+      pagination.page,
+      pagination.perpage
+    )
+    return response.send(await transform.paginate(bar, Transformer))
   }
 
   /**
@@ -40,7 +37,19 @@ class BarController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async store ({ request, response }) {
+  async store({ request, response, transform }) {
+    const transaction = await Database.beginTransaction()
+    try {
+      let bar = request.only(['barname', 'cnpj', 'address', 'addressNum', 'neighborhood', 'city', 'state', 'zipCode'])
+      bar = await Bar.create(bar, transaction)
+      await transaction.commit()
+      return response
+        .status(201)
+        .send(await transform.item(bar, Transformer))
+    } catch (error) {
+      await transaction.rollback()
+      return response.status(error.status).send(error)
+    }
   }
 
   /**
@@ -52,19 +61,7 @@ class BarController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async show ({ params, request, response, view }) {
-  }
-
-  /**
-   * Render a form to update an existing bar.
-   * GET bars/:id/edit
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async edit ({ params, request, response, view }) {
+  async show({ params, request, response, view }) {
   }
 
   /**
@@ -75,7 +72,7 @@ class BarController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async update ({ params, request, response }) {
+  async update({ params, request, response }) {
   }
 
   /**
@@ -86,7 +83,7 @@ class BarController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async destroy ({ params, request, response }) {
+  async destroy({ params, request, response }) {
   }
 }
 

@@ -4,6 +4,12 @@
 const Model = use('Model')
 
 class BarTable extends Model {
+    bar() {
+        return this.belongsTo('App/Models/Bar')
+    }
+    order() {
+        return this.hasMany('App/Models/Order')
+    }
 }
 
 module.exports = BarTable

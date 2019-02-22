@@ -42,11 +42,10 @@ class CategoryController {
     async store({ request, response, transform }) {
         const transaction = await Database.beginTransaction()
         try {
-            const { title, description } = request.all()
+            const { title } = request.all()
 
             const category = new Category()
             category.title = title
-            category.description = description
 
             // Tratamento da imagem
             const image = request.file('image', {

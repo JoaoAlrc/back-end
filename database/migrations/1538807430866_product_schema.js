@@ -11,6 +11,13 @@ class ProductSchema extends Schema {
             table.string('name', 200).notNullable()
             table.text('description')
             table.decimal('price', 12, 2).notNullable()
+            table.integer('category_id').unsigned()
+
+            table
+                .foreign('category_id')
+                .references('id')
+                .inTable('categories')
+                .onDelete('cascade')
             table.timestamps()
         })
 

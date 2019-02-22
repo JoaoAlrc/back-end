@@ -40,6 +40,8 @@ Route.group(() => {
 
 // Administration Routes
 Route.group(() => {
+    Route.resource('bar', 'BarController').apiOnly()
+    Route.resource('barTable', 'BarTableController').apiOnly()
     Route.resource('category', 'CategoryController')
         .apiOnly()
         .validator(
