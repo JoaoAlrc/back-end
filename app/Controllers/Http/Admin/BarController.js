@@ -61,7 +61,9 @@ class BarController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async show({ params, request, response, view }) {
+  async show({ params, response, transform }) {
+    const bar = await Bar.findOrFail(params.id)
+    return response.send(await transform.item(bar, Transformer))
   }
 
   /**
