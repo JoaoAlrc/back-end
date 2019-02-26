@@ -7,6 +7,10 @@ class Bar extends Model {
     table() {
         return this.hasMany('App/Models/BarTable')
     }
+
+    stock() {
+        return this.hasMany('App/Models/Stock')
+    }
 }
 
 module.exports = Bar

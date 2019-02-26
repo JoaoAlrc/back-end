@@ -24,6 +24,10 @@ class Product extends Model {
     coupons() {
         return this.belongsToMany('App/Models/Coupon')
     }
+
+    stock() {
+        return this.hasMany('App/Models/Stock')
+    }
 }
 
 module.exports = Product

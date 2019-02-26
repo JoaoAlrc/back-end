@@ -20,8 +20,6 @@ class UserSchema extends Schema {
             table.string('city', 50).notNullable()
             table.string('state', 2).notNullable()
             table.string('zipCode', 9).notNullable()
-            // table.integer('total_purchases').defaultTo(0).unsigned()
-            // table.decimal('total_spent', 12, 2).defaultTo(0.0).unsigned()
             table.integer('image_id').unsigned()
             table.timestamps()
         })
