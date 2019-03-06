@@ -5,7 +5,7 @@
 /** @typedef {import('@adonisjs/framework/src/View')} View */
 
 const Stock = use('App/Models/Stock')
-const Transformer = use('App/Transformers/Product/ProductTransformer')
+const Transformer = use('App/Transformers/Stock/StockTransformer')
 const Database = use('Database')
 
 /**
@@ -37,7 +37,19 @@ class StockController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async store ({ request, response }) {
+  async store({ request, response, transform }) {
+    const transaction = await Database.beginTransaction()
+    try {
+      let stock = request.only(['product_id', 'bar_id', 'stock'])
+      stock = await Stock.create(stock, transaction)
+      await transaction.commit()
+      return response
+        .status(201)
+        .send(await transform.item(stock, Transformer))
+    } catch (error) {
+      await transaction.rollback()
+      return response.status(error.status).send(error)
+    }
   }
 
   /**

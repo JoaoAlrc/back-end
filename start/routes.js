@@ -51,6 +51,7 @@ Route.group(() => {
             ])
         )
     Route.resource('product', 'ProductController').apiOnly()
+    Route.resource('stock', 'StockController').apiOnly()
     Route.resource('coupon', 'CouponController').apiOnly()
     Route.resource('order', 'OrderController').apiOnly()
     Route.resource('image', 'ImageController').apiOnly()
