@@ -16,6 +16,7 @@ class StockTransformer extends TransformerAbstract {
     return {
      // add your transformation object here
      id: stock.id,
+     category_id: stock.category_id,
      product_id: stock.product_id,
      bar_id: stock.bar_id,
      stock: stock.stock

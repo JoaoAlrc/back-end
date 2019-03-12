@@ -7,10 +7,16 @@ class StockSchema extends Schema {
   up() {
     this.create('stocks', (table) => {
       table.increments()
-      table.integer('product_id').unsigned()
-      table.integer('bar_id').unsigned()
+      table.integer('category_id').unsigned().notNullable()
+      table.integer('product_id').unsigned().notNullable()
+      table.integer('bar_id').unsigned().notNullable()
       table.integer('stock').defaultTo(0)
 
+      table
+        .foreign('category_id')
+        .references('id')
+        .inTable('categories')
+        .onDelete('cascade')
       table
         .foreign('product_id')
         .references('id')

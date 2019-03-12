@@ -23,11 +23,11 @@ class StockController {
    */
   async index({ request, response, view, transform, pagination }) {
     const stock = await Stock.query().paginate(
-        pagination.page,
-        pagination.perpage
+      pagination.page,
+      pagination.perpage
     )
     return response.send(await transform.paginate(stock, Transformer))
-}
+  }
 
   /**
    * Create/save a new stock.
@@ -40,7 +40,7 @@ class StockController {
   async store({ request, response, transform }) {
     const transaction = await Database.beginTransaction()
     try {
-      let stock = request.only(['product_id', 'bar_id', 'stock'])
+      let stock = request.only(['category_id', 'product_id', 'bar_id', 'stock'])
       stock = await Stock.create(stock, transaction)
       await transaction.commit()
       return response
@@ -61,7 +61,26 @@ class StockController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async show ({ params, request, response, view }) {
+  async show({ params, response, transform }) {
+    const stock = await Stock.findOrFail(params.id)
+    return response.send(await transform.item(stock, Transformer))
+  }
+
+  /**
+   * Display a single stock.
+   * GET stocks/:id
+   *
+   * @param {object} ctx
+   * @param {Request} ctx.request
+   * @param {Response} ctx.response
+   * @param {View} ctx.view
+   */
+  async getStock({ params, response, transform, pagination }) {
+    const stock = await Stock.query().where('bar_id', params.bar_id).paginate(
+      pagination.page,
+      pagination.perpage
+    )
+    return response.send(await transform.paginate(stock, Transformer))
   }
 
   /**
@@ -72,7 +91,7 @@ class StockController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async update ({ params, request, response }) {
+  async update({ params, request, response }) {
   }
 
   /**
@@ -83,7 +102,7 @@ class StockController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async destroy ({ params, request, response }) {
+  async destroy({ params, request, response }) {
   }
 }
 

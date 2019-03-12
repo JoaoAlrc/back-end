@@ -18,7 +18,7 @@ const Route = use('Route')
 
 // Authentication Routes
 Route.group(() => {
-    Route.post('/register', 'AuthController.register')
+    Route.post('register', 'AuthController.register')
         .as('auth.register')
         .validator('Clients/ClientRegister')
 
@@ -52,6 +52,7 @@ Route.group(() => {
         )
     Route.resource('product', 'ProductController').apiOnly()
     Route.resource('stock', 'StockController').apiOnly()
+    Route.get('getStock/:bar_id', 'StockController.getStock').as('admin.getStock')
     Route.resource('coupon', 'CouponController').apiOnly()
     Route.resource('order', 'OrderController').apiOnly()
     Route.resource('image', 'ImageController').apiOnly()
